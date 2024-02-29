@@ -57,7 +57,8 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_WHITELIST = [
     # Preferred Origins here....
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "https://billy-06.github.io/APIFrontend/"
 ]
 
 APPEND_SLASH=False
