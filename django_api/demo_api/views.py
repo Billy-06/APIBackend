@@ -1,6 +1,8 @@
 # From Django
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
+
 #  From my project
 from demo_api.permissions import *
 from demo_api.models import Project, User, Article
@@ -25,32 +27,61 @@ json_parser = JSONParser()
 def homepage(request):
     return HttpResponse("<h2>Homepage</h2>")
 
+class SignUpAPI(APIView):
+    def post(self, request):
+        
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        # Check if the username or email already exists
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a new user
+        user = User.objects.create_user(username=username, email=email, password=password)
+
+        # Optionally, you can log in the user after registration
+        # authenticate(request, username=username, password=password)
+        # login(request, user)
+
+        return Response({'success': 'User created successfully', "user": { "email": user.email, "username": user.username }}, status=status.HTTP_201_CREATED)
 
 class LoginAPI(APIView):
     def post(self, request):
-        userList = User.objects.all()
 
         username = request.data.get('username')
         password = request.data.get('password')
 
-        # 1. Option One: Using simple Authentication
-        # find the user with the given username 
-        user = userList.filter(name=username).first()
+        print(f"username {username}, password: {password}")
 
-        if user:
-            if user.password == password:
-                return Response({'token': secrets.token_urlsafe(16)})
-            else:
-                return Response({'error': 'Invalid credentials'}, status=400)
+        # 1. Option One: Using simple Authentication
+        # find the user with the given username
+        # user = userList.filter(name=username).first()
+
+        # if user:
+        #     if user.password == password:
+        #         return Response({'token': secrets.token_urlsafe(16)}, status=200)
+        #     else:
+        #         return Response({'error': 'Invalid credentials'}, status=400)
         
         # 2. Option Two: Using Django's built-in authentication
-        # user = authenticate(username=username, password=password)
         
-        # if user:
-        #     token, _ = Token.objects.get_or_create(user=user)
-        #     return Response({'token': token.key})
-        # else:
-        #     return Response({'error': 'Invalid credentials'}, status=400)
+        user = User.objects.get(username=username)
+        if check_password(password, user.password):
+            print('Password matches')
+            # user = authenticate(username=username, password=password)
+            # token, _ = Token.objects.get_or_create(user=user_confirmed)
+            # return Response({'token': token.key})
+            token = secrets.token_urlsafe(16)
+            return Response({'token': token})
+        else:
+            print('Password does not match')
+            return Response({'error': 'Invalid credentials'}, status=400)
+        
 
 # Class-based Project Details views implementing, GET, PUT, and DELETE methods
 class ProjectDetails(APIView):

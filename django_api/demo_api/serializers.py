@@ -34,13 +34,13 @@ class ProjectSerializer(serializers.Serializer):
 class UserSerializer(serializers.Serializer):
     """
     User Serializer with the below fields:
-        - name {string}: name of the user
+        - username {string}: username of the user
         - email {string}: email of the user
         - projects {list}: list of projects created by the user
         - articles {list}: list of articles created by the user
     """
     id= serializers.IntegerField(read_only=True)
-    name = serializers.CharField(max_length=100)
+    username = serializers.CharField(max_length=100)
     about = serializers.CharField()
     email = serializers.EmailField()
     projects = serializers.PrimaryKeyRelatedField(many=True, queryset=Project.objects.all())
@@ -48,14 +48,14 @@ class UserSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ['name', 'about', 'email', 'projects', 'articles']
+        fields = ['username', 'about', 'email', 'projects', 'articles']
 
     def create(self, validated_data):
         """
         Creates a new user and takes validated data as input
         """
         instance = User.objects.create(
-            name=validated_data['name'],
+            name=validated_data['username'],
             about=validated_data['about'],
             email=validated_data['email'],
         )
@@ -68,7 +68,7 @@ class UserSerializer(serializers.Serializer):
         """
         Update an existing user, takes teh existing object and the validated data as inputs
         """
-        instance.name = validated_data.get('name', instance.name)
+        instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.about = validated_data.get('about', instance.about)
         instance.projects.set( [validated_data.get('projects', instance.projects)] )

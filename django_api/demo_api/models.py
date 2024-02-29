@@ -1,4 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, UserManager
+
+class CustomUserManager(UserManager):
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        return self._create_user(username, email, password, **extra_fields)
+
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        return self._create_user(username, email, password, **extra_fields)
 
 # Project Class Definition
 class Project(models.Model):
@@ -27,29 +35,40 @@ class Project(models.Model):
         return f"{self.name}"
     
 # User Class Definition
-class User(models.Model):
+class User(AbstractBaseUser, models.Model):
     """
     Model class representing a user with the below fields:
-     - name {string}: name of the user
+     - username {string}: username of the user
      - email {string}: email of the user
      - password {string}: password of the user
      - projects {list}: list of projects created by the user
      - articles {list}: list of articles created by the user
     """
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, blank=False, null=False)
+    username = models.CharField(max_length=100, blank=False, null=False)
     email = models.EmailField(blank=False, null=False)
     about = models.TextField(blank=False, null=False, default="About section not yet provided")
     password = models.CharField(max_length=100, blank=False, null=False)
     projects = models.ManyToManyField(Project, blank=True)
     articles = models.ManyToManyField('Article', blank=True)
+    # is_staff = False
+    # is_superuser = False
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = [
+        "username",
+        "email",
+        "password"
+    ]
 
     class Meta:
-        ordering = ['name']
+        ordering = ['username']
         verbose_name = 'User'
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return f"{self.username}"
     
 # Article Class Definition
 class Article(models.Model):

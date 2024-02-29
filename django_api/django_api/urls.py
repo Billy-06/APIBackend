@@ -22,6 +22,7 @@ from demo_api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.homepage),
+    path('signup/', views.SignUpAPI.as_view()),
     path('login/', views.LoginAPI.as_view()),
     path('projects/', views.ProjectList.as_view()),
     path('projects/<int:pk>/', views.ProjectDetails.as_view()),
