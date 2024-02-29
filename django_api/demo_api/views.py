@@ -44,7 +44,6 @@ class SignUpAPI(APIView):
         # Create a new user
         user = User.objects.create_user(username=username, email=email, password=password)
 
-        # Optionally, you can log in the user after registration
         # authenticate(request, username=username, password=password)
         # login(request, user)
 
@@ -58,18 +57,6 @@ class LoginAPI(APIView):
 
         print(f"username {username}, password: {password}")
 
-        # 1. Option One: Using simple Authentication
-        # find the user with the given username
-        # user = userList.filter(name=username).first()
-
-        # if user:
-        #     if user.password == password:
-        #         return Response({'token': secrets.token_urlsafe(16)}, status=200)
-        #     else:
-        #         return Response({'error': 'Invalid credentials'}, status=400)
-        
-        # 2. Option Two: Using Django's built-in authentication
-        
         user = User.objects.get(username=username)
         if check_password(password, user.password):
             print('Password matches')
