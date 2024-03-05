@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-)vz-wml80hv1-9_l8u-ofoc)qm%@3x1mgff!gedcjiftr=st75
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    "localhost",
+    "https://crispy-sniffle-7xxvgrxpjqvcpgpq-8000.app.github.dev",
     "apibackend-pd3a.onrender.com"
 ]
 
